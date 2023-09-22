@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -36,22 +37,39 @@ export class AuthService {
   }
 
   async loginUser(loginUserDto: LoginUserDto) {
-    const { password, email } = loginUserDto;
+    let { password, email } = loginUserDto;
 
     const user = await this.userRepository.findOne({
-      where: { email },
+      where: { email: email },
       select: { email: true, password: true, id: true }, //Solo recibir estos datos
     });
 
     console.log({ user });
 
+    if (!user) throw new NotFoundException('Credenciales no validas');
+
     if (!bcrypt.compareSync(password, user.password))
       // Comparar password encriptada con la de la bd
       throw new UnauthorizedException('Contraseña no valida');
 
-    if (!user) throw new UnauthorizedException('Credenciales no validas');
+    const role = await this.getUserRole(user);
 
-    return { ...user, token: this.getJwtToken({ id: user.id }) };
+    if (role === 'user')
+      throw new UnauthorizedException('No tienes permisos para acceder!');
+
+    return { ...user, role: role, token: this.getJwtToken({ id: user.id }) };
+  }
+
+  async getUserRole(user: User) {
+    const findUser = await this.userRepository.findOne({
+      where: { email: user.email },
+    });
+
+    const { role } = findUser;
+
+    if (!role) throw new BadRequestException('Este usuario no tiene rol.');
+
+    return role;
   }
 
   private getJwtToken(payload: JwtPayload) {

@@ -1,23 +1,31 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
-@Entity({ name: 'products' }) // Transformar la clase en una tabla
-export class Product{
- 
-    @PrimaryGeneratedColumn() // ID autoincremental
-    id: number
+@Entity({ name: 'products' })
+export class Product {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column() // Transoformar en columna de una tabla
-    name: string
+  @Column()
+  name: string;
 
-    @Column()
-    description: string
+  @Column()
+  description: string;
 
-    @Column()
-    price: number
+  @Column()
+  price: number;
 
-    @Column()
-    category: string
+  @Column()
+  category: string;
 
-    @Column()
-    stock: number
+  @Column()
+  stock: number;
+
+  @Column()
+  imagePath: string;
 }

@@ -9,8 +9,14 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
   ) {}
-  createProduct(product: CreateProductDto) {
-    const newProduct = this.productRepository.create(product);
+  async createProduct(product: CreateProductDto, file: Express.Multer.File) {
+    let { imagePath, ...detailsProduct } = product;
+
+    imagePath = file.originalname;
+    const newProduct = this.productRepository.create({
+      ...detailsProduct,
+      imagePath,
+    });
     return this.productRepository.save(newProduct);
   }
 
@@ -19,7 +25,11 @@ export class ProductsService {
   }
 
   async getProductsCategory(category: string): Promise<Product[]> {
-    return this.productRepository.find({ where: { category: category } });
+    return await this.productRepository.find({ where: { category: category } });
+  }
+
+  async getProductById(id: number) {
+    return await this.productRepository.findOneBy({ id });
   }
 
   async deleteProduct(id: number): Promise<void> {
