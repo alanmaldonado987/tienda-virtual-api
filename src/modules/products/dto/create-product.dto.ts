@@ -21,5 +21,5 @@ export class CreateProductDto {
   @Min(1)
   stock: number;
 
-  imagePath: string;
+  imagePath: Express.Multer.File;
 }

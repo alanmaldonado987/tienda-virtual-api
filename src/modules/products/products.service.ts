@@ -9,14 +9,8 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product) private productRepository: Repository<Product>,
   ) {}
-  async createProduct(product: CreateProductDto, file: Express.Multer.File) {
-    let { imagePath, ...detailsProduct } = product;
-
-    imagePath = file.originalname;
-    const newProduct = this.productRepository.create({
-      ...detailsProduct,
-      imagePath,
-    });
+  async createProduct(product: CreateProductDto) {
+    const newProduct = this.productRepository.create(product);
     return this.productRepository.save(newProduct);
   }
 

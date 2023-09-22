@@ -23,19 +23,21 @@ export class ProductsController {
   constructor(private productService: ProductsService) {}
 
   @Post('/addProduct')
-  @Auth(ValidRoles.admin)
   @UseInterceptors(FileInterceptor('file', { fileFilter: FileFilter }))
   async createProduct(
     @Body() newProduct: any, //corregir esta parte!
     @UploadedFile() file: Express.Multer.File,
   ) {
     if (!file) {
-      throw new BadRequestException('El tipo de archivo no está permitido');
+      //throw new BadRequestException('El tipo de archivo no está permitido');
     }
+    const prueba = {
+      ...newProduct,
+      file,
+    };
+    const product = await this.productService.createProduct(prueba);
 
-    const product = await this.productService.createProduct(newProduct, file);
-
-    return product;
+    return prueba;
   }
 
   @Post('/prueba')
@@ -44,6 +46,7 @@ export class ProductsController {
     if (!file) {
       throw new BadRequestException('El tipo de archivo no está permitido');
     }
+    console.log(file.originalname);
     return file;
   }
 

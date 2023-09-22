@@ -25,7 +25,4 @@ export class Product {
 
   @Column()
   stock: number;
-
-  @Column()
-  imagePath: string;
 }
